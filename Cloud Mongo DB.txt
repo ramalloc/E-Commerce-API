@@ -1,0 +1,12 @@
+cloud MongoDB 
+
+roshangupta1887@gmial.com
+Omnamah58627*
+
+user -> E-Kom
+Omnamah8*
+
+Database Name = E-CommerceNodeJs
+
+Collection = E-Commerce
+
