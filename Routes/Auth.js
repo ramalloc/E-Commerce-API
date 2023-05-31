@@ -4,6 +4,9 @@
 const router = require('express').Router();
 const User = require('../Models/User');
 const CryptoJS = require('crypto-js');
+
+// We are using son Web Token to verify that the requests(add, remove cart) are belongs to the client or not
+
 // REGISTER ROUTE
 
 router.post("/register", async (req, res) => {
@@ -39,10 +42,15 @@ router.post("/login", async (req, res) => {
         
         // Now here we need to decrypt the password, which is saved in database as (Hash Values). So we are using CrytpoJS
         const hashedPassword = CryptoJS.AES.decrypt(user.password, process.env.PASS_SEC);
-        const password = hashedPassword.toString(CryptoJS.enc.Utf8);
-        password !== req.body.password && res.status(401).json("Wrong Credentials");
+        const Originalpassword = hashedPassword.toString(CryptoJS.enc.Utf8);
+        Originalpassword !== req.body.password && res.status(401).json("Wrong Credentials"); 
 
-        res.status(200).json(user);
+        // There is a problem in login, we post hashed password also in user Details
+        // So to hide the hash password of the user we will use (...others) 
+        const {password, ...others} = user._doc;
+
+
+        res.status(200).json(others);
 
     } catch (err){
         res.status(500).json(err);
