@@ -6,7 +6,7 @@ const User = require('../Models/User');
 const CryptoJS = require('crypto-js');
 
 // After login process, we will provide them jwt
-// We are using json Web Token to verify that the requests(user,product and cart(remove or add)) are belongs to the client or not
+// We are using json Web Token to verify the user and requests from users to Add, delete or update products, categories etc. .
 const jwt = require('jsonwebtoken');
 
 // REGISTER ROUTE
