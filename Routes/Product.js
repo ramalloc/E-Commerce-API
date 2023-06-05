@@ -77,59 +77,22 @@ router.get("/", verifyTokenAndAdmin, async (req, res) => {
         let products;
 
         if (qNew) {
-            products = await Product.find().sort({ createdAt: -1 }).limit(5);
+            products = await Product.find().sort({ createdAt: -1 }).limit(1);
         } else if (qCategories) {
             products = await Product.find({
                 categories: {
                     $in: [qCategories],
                 },
             });
-        } else{
+        } else {
             products = await Product.find();
         }
 
-        res.status(200).json(users);
+        res.status(200).json(products);
 
     } catch (err) {
         res.status(500).json(err);
     }
-});
-
-
-
-// GET USER STATUS
-// this will return total users per month.
-router.get("/status", verifyTokenAndAdmin, async (req, res) => {
-    const date = new Date();
-    const lastYear = new Date(date.setFullYear(date.getFullYear() - 1)); // this will gives last year
-
-    try {
-        // We are using mongoDB aggregiate to group the items
-        const data = await User.aggregate([
-            // First we have to write our condition
-            { $match: { createdAt: { $gte: lastYear } } }, // It should be less than today and greater than past year
-
-            // Taking month numbers to do that we use $project
-            {
-                $project: {
-                    month: { $month: "$createdAt" }, // Just created Month variable here, It will take the month from "createdAt" and assign to month
-                }
-            },
-
-            // grouping Items and users
-            {
-                $group: {
-                    _id: "$month", // It should be unique therefore we chose month from above
-                    total: { $sum: 1 }, // Getting total user
-                },
-            },
-
-        ]);
-        res.status(200).json(data); // This is returning the Total no. of IDs created in a month
-    } catch (err) {
-        res.status(500).json(err);
-    }
-
 });
 
 module.exports = router;
