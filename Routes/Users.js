@@ -20,7 +20,7 @@ router.put("/:id", verifyToken, verifyTokenAndAutharization, async (req, res) =>
             process.env.PASS_SEC
         ).toString();
     }
-     
+
 
     // Now we have to update the requests on server
     try {
@@ -71,12 +71,51 @@ router.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
 // GET ALL USERS 
 router.get("/", verifyTokenAndAdmin, async (req, res) => {
     try {
-        const users = await User.find();
+        // To get limited Users from the db or to use query in link/routes to limit the get users.
+        const query = req.query.new;
+        const users = query ? await User.find().sort({ _id: -1 }).limit(5) : await User.find();
         res.status(200).json(users);
 
     } catch (err) {
         res.status(500).json(err);
     }
+});
+
+
+
+// GET USER STATUS
+// this will return total users per month.
+router.get("/status", verifyTokenAndAdmin, async (req, res) => {
+    const date = new Date();
+    const lastYear = new Date(date.setFullYear(date.getFullYear() - 1)); // this will gives last year
+
+    try {
+        // We are using mongoDB aggregiate to group the items
+        const data = await User.aggregate([
+            // First we have to write our condition
+            { $match: { createdAt: { $gte: lastYear } } }, // It should be less than today and greater than past year
+
+            // Taking month numbers to do that we use $project
+            {
+                $project: {
+                    month: { $month: "$createdAt" }, // Just created Month variable here, It will take the month from "createdAt" and assign to month
+                }
+            },
+
+            // grouping Items and users
+            {
+                $group: {
+                    _id: "$month", // It should be unique therefore we chose month from above
+                    total: { $sum: 1 }, // Getting total user
+                },
+            },
+
+        ]);
+        res.status(200).json(data); // This is returning the Total no. of IDs created in a month
+    } catch (err) {
+        res.status(500).json(err);
+    }
+
 });
 
 module.exports = router;
