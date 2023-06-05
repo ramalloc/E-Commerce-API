@@ -8,7 +8,7 @@ const router = require('express').Router();
 router.post("/", verifyTokenAndAdmin, async (req, res) => {
     const newProduct = new Product(req.body);
     try {
-        const savedProduct = await newProduct.save();        
+        const savedProduct = await newProduct.save();
         res.status(200).json(savedProduct);
     } catch (err) {
         res.status(500).json(err);
@@ -23,11 +23,11 @@ router.post("/", verifyTokenAndAdmin, async (req, res) => {
 
 // UPDATE IN Product 
 router.put("/:id", verifyTokenAndAdmin, async (req, res) => {
-      // Now we have to update the requests on server
+    // Now we have to update the requests on server
     try {
         const updatedProduct = await Product.findByIdAndUpdate(
-            req.params.id, { 
-            $set: req.body 
+            req.params.id, {
+            $set: req.body
         }, { new: true }
         );
         // To send update Product
@@ -65,12 +65,29 @@ router.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
 
 
 
-// GET ALL USERS 
+// GET ALL Products
+// We are adding here two queries to fetch all products and also according to the categories. 
 router.get("/", verifyTokenAndAdmin, async (req, res) => {
+    // To get limited Products 
+    const qNew = req.query.new;
+
+    // To get category vise Products 
+    const qCategories = req.query.categories;
     try {
-        // To get limited Users from the db or to use query in link/routes to limit the get users.
-        const query = req.query.new;
-        const users = query ? await User.find().sort({ _id: -1 }).limit(5) : await User.find();
+        let products;
+
+        if (qNew) {
+            products = await Product.find().sort({ createdAt: -1 }).limit(5);
+        } else if (qCategories) {
+            products = await Product.find({
+                categories: {
+                    $in: [qCategories],
+                },
+            });
+        } else{
+            products = await Product.find();
+        }
+
         res.status(200).json(users);
 
     } catch (err) {
