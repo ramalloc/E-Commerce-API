@@ -1,5 +1,5 @@
 const Product = require('../Models/Product');
-const { verifyToken, verifyTokenAndAutharization, verifyTokenAndAdmin } = require('./verifyToken');
+const { verifyTokenAndAdmin } = require('./verifyToken');
 
 const router = require('express').Router();
 
