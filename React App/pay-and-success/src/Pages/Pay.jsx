@@ -21,7 +21,7 @@ const Pay = () => {
         image="https://avatars.githubusercontent.com/u/1486366?v=4"
         billingAddress
         shippingAddress
-        description= "Your total is $20"
+        description= "Your total is $30"
         amount = {3000}
         token={onToken}
         stripekey= {KEY}
